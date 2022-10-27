@@ -1498,6 +1498,7 @@ void help_Readme(){
   printString("\r\n\n ---> [roboDrive Engine Instruction set] <---\r\n");
   printString("\r\n   --------------------------------------------\r\n");
   printString("\r\n   -------  > Run Control < ----------------------\r\n");
+  printString("\r\n   --------------------------------------------\r\n");
   printString("\r\n -> press [T] (Update Time/Date)\r\n");
   printString("\r\n -> press [O] (Configure Kinetics and Parameters)\r\n");
   printString("\r\n -> press [B] (Start Vibrations Scanning)\r\n");
@@ -1509,6 +1510,7 @@ void help_Readme(){
   printString("\r\n -> press [H] (Help/Readme)\r\n\n");
   printString("\r\n   --------------------------------------------\r\n");
   printString("\r\n   -------  > Drivetrain Control < ----------------------\r\n");
+  printString("\r\n   --------------------------------------------\r\n");
   printString("\r\n -> press [W] (Forward Drive)\r\n");
   printString("\r\n -> press [S] (Reverse Drive/Go-Back)\r\n");
   printString("\r\n -> press [A] (Turn Left)\r\n");
@@ -1516,6 +1518,7 @@ void help_Readme(){
   printString("\r\n -> press [X] (Stop|Brake)\r\n\n");
   printString("\r\n   --------------------------------------------\r\n");
   printString("\r\n   -------  > Tower Control < ----------------------------\r\n");
+  printString("\r\n   --------------------------------------------\r\n");
   printString("\r\n -> press [4] (Look Left)\r\n");
   printString("\r\n -> press [6] (Look Right)\r\n");
   printString("\r\n -> press [8] (Look Up)\r\n");
@@ -1526,6 +1529,7 @@ void help_Readme(){
   printString("\r\n -> cycle [SHIFT]+[/] with [SHIFT]+[*] (Mode Change)\r\n\n");
   printString("\r\n   --------------------------------------------\r\n");
   printString("\r\n   -------  > Manipulator Control < ----------------------\r\n");
+  printString("\r\n   --------------------------------------------\r\n");
   printString("\r\n -> press [#] (Recover Both Arms from random position)\r\n");
   printString("\r\n -> press [7] (Recover Left-Arm  from random position (arm has been touched/moved by accident in OFF state))\r\n");
   printString("\r\n -> press [9] (Recover Right-Arm from random position (arm has been touched/moved by accident in OFF state))\r\n");
@@ -1533,6 +1537,8 @@ void help_Readme(){
   printString("\r\n -> press [k] (Park Both Arms)\r\n");
   printString("\r\n -> press [L] (Park Left  Mecha-Arm)\r\n");
   printString("\r\n -> press [R] (Park Right Mecha-Arm)\r\n");
+  printString("\r\n -> press [a] (Deploy State-1 Left  Mecha-Arm)\r\n");
+  printString("\r\n -> press [l] (Deploy State-1 Right Mecha-Arm)\r\n");
   printString("\r\n -> press [SHIFT]+[-] (Activate Both Arms)\r\n");
   printString("\r\n -> press [SHIFT]+[+] (Lift-Up Both Arms)\r\n\n");
   printString("\r\n -> press [1] (Deploy Both Arms > State-1)\r\n");
@@ -1548,6 +1554,7 @@ void help_Readme(){
   printString("\r\n -> press [p] (Crane Backward >> Gradually Right Mecha-Arm )\r\n");
   printString("\r\n   --------------------------------------------\r\n");
   printString("\r\n   -------  > Gripper Control < --------------------------\r\n");
+  printString("\r\n   --------------------------------------------\r\n");
   printString("\r\n -> press [d] (Open  Gradually >> Left  Gripper)\r\n");
   printString("\r\n -> press [f] (Close Gradually >> Left  Gripper)\r\n");
   printString("\r\n -> press [h] (Open  Gradually >> Right Gripper)\r\n");
@@ -2269,6 +2276,12 @@ void pcLinkSerial(void){                         // computer link!, function to 
                 case 'R' :                                      // ------------------ park arm (right) >> parked state (current draw ~ 0.6A)
                     roboDrive_ParkRightArm(servo_speed_mecha_arms);                            // speed >> ((superfast) 0 - 255 (very slow))
                         break;
+                case 'a' :                                 // ------------------- deploy arm state-1 (left) >> state-1 (current draw ~ 0.6A)
+                    roboDrive_DeployLeft_Arm_State1(servo_speed_mecha_arms);                   // speed >> ((superfast) 0 - 255 (very slow))
+                        break;
+                case 'l' :                                // ------------------- deploy arm state-1 (right) >> state-1 (current draw ~ 0.6A)
+                    roboDrive_DeployRight_Arm_State1(servo_speed_mecha_arms);                  // speed >> ((superfast) 0 - 255 (very slow))
+                        break;
                 case 'k' :                                      // ------------- park arms (lef/right) >> parked state (current draw ~ 0.6A)
                     roboDrive_ParkArms(servo_speed_mecha_arms);                                // speed >> ((superfast) 0 - 255 (very slow))
                         break;
@@ -2635,6 +2648,7 @@ int main(void){
         printString("\r\n\n ---> [roboDrive Engine Instruction set] <---\r\n");
         printString("\r\n   --------------------------------------------\r\n");
         printString("\r\n   -------  > Run Control < ----------------------\r\n");
+        printString("\r\n   --------------------------------------------\r\n");
         printString("\r\n -> press [T] (Update Time/Date)\r\n");
         printString("\r\n -> press [O] (Configure Kinetics and Parameters)\r\n");
         printString("\r\n -> press [B] (Start Vibrations Scanning)\r\n");
@@ -2646,6 +2660,7 @@ int main(void){
         printString("\r\n -> press [H] (Help/Readme)\r\n\n");
         printString("\r\n   --------------------------------------------\r\n");
         printString("\r\n   -------  > Drivetrain Control < ----------------------\r\n");
+        printString("\r\n   --------------------------------------------\r\n");
         printString("\r\n -> press [W] (Forward Drive)\r\n");
         printString("\r\n -> press [S] (Reverse Drive/Go-Back)\r\n");
         printString("\r\n -> press [A] (Turn Left)\r\n");
@@ -2653,6 +2668,7 @@ int main(void){
         printString("\r\n -> press [X] (Stop|Brake)\r\n\n");
         printString("\r\n   --------------------------------------------\r\n");
         printString("\r\n   -------  > Tower Control < ----------------------------\r\n");
+        printString("\r\n   --------------------------------------------\r\n");
         printString("\r\n -> press [4] (Look Left)\r\n");
         printString("\r\n -> press [6] (Look Right)\r\n");
         printString("\r\n -> press [8] (Look Up)\r\n");
@@ -2663,6 +2679,7 @@ int main(void){
         printString("\r\n -> cycle [SHIFT]+[/] with [SHIFT]+[*] (Mode Change)\r\n\n");
         printString("\r\n   --------------------------------------------\r\n");
         printString("\r\n   -------  > Manipulator Control < ----------------------\r\n");
+        printString("\r\n   --------------------------------------------\r\n");
         printString("\r\n -> press [#] (Recover Both Arms from random position)\r\n");
         printString("\r\n -> press [7] (Recover Left-Arm  from random position (arm has been touched/moved by accident in OFF state))\r\n");
         printString("\r\n -> press [9] (Recover Right-Arm from random position (arm has been touched/moved by accident in OFF state))\r\n");
@@ -2670,6 +2687,8 @@ int main(void){
         printString("\r\n -> press [k] (Park Both Arms)\r\n");
         printString("\r\n -> press [L] (Park Left  Mecha-Arm)\r\n");
         printString("\r\n -> press [R] (Park Right Mecha-Arm)\r\n");
+        printString("\r\n -> press [a] (Deploy State-1 Left  Mecha-Arm)\r\n");
+        printString("\r\n -> press [l] (Deploy State-1 Right Mecha-Arm)\r\n");
         printString("\r\n -> press [SHIFT]+[-] (Activate Both Arms)\r\n");
         printString("\r\n -> press [SHIFT]+[+] (Lift-Up Both Arms)\r\n\n");
         printString("\r\n -> press [1] (Deploy Both Arms > State-1)\r\n");
@@ -2685,6 +2704,7 @@ int main(void){
         printString("\r\n -> press [p] (Crane Backward >> Gradually Right Mecha-Arm )\r\n");
         printString("\r\n   --------------------------------------------\r\n");
         printString("\r\n   -------  > Gripper Control < --------------------------\r\n");
+        printString("\r\n   --------------------------------------------\r\n");
         printString("\r\n -> press [d] (Open  Gradually >> Left  Gripper)\r\n");
         printString("\r\n -> press [f] (Close Gradually >> Left  Gripper)\r\n");
         printString("\r\n -> press [h] (Open  Gradually >> Right Gripper)\r\n");

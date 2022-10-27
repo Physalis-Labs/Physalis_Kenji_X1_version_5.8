@@ -2338,7 +2338,7 @@ void pcLinkSerial(void){                         // computer link!, function to 
                 case 'B' :
                     vibration_Scanning();
                         break;
-                case 'L' :
+                case 'Z' :
                     temperatureScanner();
                         break;
                 case 'F' :

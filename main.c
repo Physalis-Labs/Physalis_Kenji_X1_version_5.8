@@ -669,14 +669,6 @@ void roboDrive_ParkArms(uint8_t parking_speed){
 void roboDrive_ParkLeftArm(uint8_t parking_speed){
                                                      // ---------- park Left-MechaArm (left) >> parked state (current draw ~ 0.6A)
 // ------------------------------------------------------- // Left-MechaArm op-codes // speed >> ((superfast) 1 - 255 (very slow))
-  // move_Servo_Bidirect(6, 30,    parking_speed, 1);
-  // move_Servo_Bidirect(5,  0,    parking_speed, 1);
-  // move_Servo_Bidirect(0, -10,   parking_speed, 1);
-  // move_Servo_Bidirect(2, -78,   parking_speed, 1);
-  // move_Servo_Bidirect(4, 111,   parking_speed, 1);
-  // move_Servo_Bidirect(3,  53,   parking_speed, 1);
-  // move_Servo_Bidirect(1, -111,  parking_speed, 1);
-// ------------------------------------------------------------------------------------------------ // left mecha arm op-codes
   move_Servo_Bidirect(13, -25,  parking_speed, 1);
   move_Servo_Bidirect(12,   0,  parking_speed, 1);
 
@@ -697,15 +689,6 @@ void roboDrive_ParkRightArm(uint8_t parking_speed){
   move_Servo_Bidirect(4, 111,   parking_speed, 1);
   move_Servo_Bidirect(3,  53,   parking_speed, 1);
   move_Servo_Bidirect(1, -111,  parking_speed, 1);
-// ------------------------------------------------------------------------------------------------ // left mecha arm op-codes
-  // move_Servo_Bidirect(13, -25,  parking_speed, 1);
-  // move_Servo_Bidirect(12,   0,  parking_speed, 1);
-  //
-  // move_Servo_Bidirect(7,   0,   parking_speed, 1);
-  // move_Servo_Bidirect(9, -70,   parking_speed, 1);
-  // move_Servo_Bidirect(11, 123,  parking_speed, 1);
-  // move_Servo_Bidirect(10,  53,  parking_speed, 1);
-  // move_Servo_Bidirect(8,  100,  parking_speed, 1);
 }
 
 void roboDrive_DeployArmsState1(uint8_t deploy_speed){
@@ -728,6 +711,30 @@ void roboDrive_DeployArmsState1(uint8_t deploy_speed){
 
   move_Servo_Bidirect(12,   0, deploy_speed, 1);
   move_Servo_Bidirect(13, -20, deploy_speed, 1);
+}
+
+void roboDrive_DeployLeft_Arm_State1(uint8_t deploy_speed){
+                                          // -------------- deploy left arm (state_1) (left) >> state 1 (current draw ~ 0.75A)
+// ------------------------------------------------- // Left mecha arm op-codes, // speed >> ((superfast) 1 - 255 (very slow))
+  move_Servo_Bidirect(7,    0, deploy_speed, 1);
+  move_Servo_Bidirect(9,  -70, deploy_speed, 1);
+  move_Servo_Bidirect(11, 125, deploy_speed, 1);
+  move_Servo_Bidirect(10,  53, deploy_speed, 1);
+  move_Servo_Bidirect(8,   80, deploy_speed, 1);
+  move_Servo_Bidirect(12,   0, deploy_speed, 1);
+  move_Servo_Bidirect(13, -20, deploy_speed, 1);
+}
+
+void roboDrive_DeployRight_Arm_State1(uint8_t deploy_speed){
+                                          // ------------ deploy right arm (state_1) (right) >> state 1 (current draw ~ 0.75A)
+// ------------------------------------------------ // right mecha arm op-codes, // speed >> ((superfast) 1 - 255 (very slow))
+  move_Servo_Bidirect(0, -10,  deploy_speed, 1);
+  move_Servo_Bidirect(2, -78,  deploy_speed, 1);
+  move_Servo_Bidirect(4, 111,  deploy_speed, 1);
+  move_Servo_Bidirect(3,  53,  deploy_speed, 1);
+  move_Servo_Bidirect(1, -90,  deploy_speed, 1);
+  move_Servo_Bidirect(5,  0,   deploy_speed, 1);
+  move_Servo_Bidirect(6, 30,   deploy_speed, 1);
 }
 
 void roboDrive_DeployArmsState2(uint8_t deploy_speed){
@@ -2338,7 +2345,7 @@ void pcLinkSerial(void){                         // computer link!, function to 
                 case 'B' :
                     vibration_Scanning();
                         break;
-                case 'L' :
+                case 'Z' :
                     temperatureScanner();
                         break;
                 case 'F' :

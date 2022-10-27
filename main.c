@@ -666,6 +666,48 @@ void roboDrive_ParkArms(uint8_t parking_speed){
   move_Servo_Bidirect(8,  100,  parking_speed, 1);
 }
 
+void roboDrive_ParkLeftArm(uint8_t parking_speed){
+                                                     // ---------- park Left-MechaArm (left) >> parked state (current draw ~ 0.6A)
+// ------------------------------------------------------- // Left-MechaArm op-codes // speed >> ((superfast) 1 - 255 (very slow))
+  // move_Servo_Bidirect(6, 30,    parking_speed, 1);
+  // move_Servo_Bidirect(5,  0,    parking_speed, 1);
+  // move_Servo_Bidirect(0, -10,   parking_speed, 1);
+  // move_Servo_Bidirect(2, -78,   parking_speed, 1);
+  // move_Servo_Bidirect(4, 111,   parking_speed, 1);
+  // move_Servo_Bidirect(3,  53,   parking_speed, 1);
+  // move_Servo_Bidirect(1, -111,  parking_speed, 1);
+// ------------------------------------------------------------------------------------------------ // left mecha arm op-codes
+  move_Servo_Bidirect(13, -25,  parking_speed, 1);
+  move_Servo_Bidirect(12,   0,  parking_speed, 1);
+
+  move_Servo_Bidirect(7,   0,   parking_speed, 1);
+  move_Servo_Bidirect(9, -70,   parking_speed, 1);
+  move_Servo_Bidirect(11, 123,  parking_speed, 1);
+  move_Servo_Bidirect(10,  53,  parking_speed, 1);
+  move_Servo_Bidirect(8,  100,  parking_speed, 1);
+}
+
+void roboDrive_ParkRightArm(uint8_t parking_speed){
+                                                     // ---------- park Right-MechaArm (right) >> parked state (current draw ~ 0.6A)
+// -------------------------------------------------------- // Right-MechaArm op-codes // speed >> ((superfast) 1 - 255 (very slow))
+  move_Servo_Bidirect(6, 30,    parking_speed, 1);
+  move_Servo_Bidirect(5,  0,    parking_speed, 1);
+  move_Servo_Bidirect(0, -10,   parking_speed, 1);
+  move_Servo_Bidirect(2, -78,   parking_speed, 1);
+  move_Servo_Bidirect(4, 111,   parking_speed, 1);
+  move_Servo_Bidirect(3,  53,   parking_speed, 1);
+  move_Servo_Bidirect(1, -111,  parking_speed, 1);
+// ------------------------------------------------------------------------------------------------ // left mecha arm op-codes
+  // move_Servo_Bidirect(13, -25,  parking_speed, 1);
+  // move_Servo_Bidirect(12,   0,  parking_speed, 1);
+  //
+  // move_Servo_Bidirect(7,   0,   parking_speed, 1);
+  // move_Servo_Bidirect(9, -70,   parking_speed, 1);
+  // move_Servo_Bidirect(11, 123,  parking_speed, 1);
+  // move_Servo_Bidirect(10,  53,  parking_speed, 1);
+  // move_Servo_Bidirect(8,  100,  parking_speed, 1);
+}
+
 void roboDrive_DeployArmsState1(uint8_t deploy_speed){
                                           // ------------- deploy arms (state_1) (lef/right) >> state 1 (current draw ~ 0.75A)
 // ------------------------------------------------- // right mecha arm op-codes,// speed >> ((superfast) 1 - 255 (very slow))
@@ -1454,7 +1496,7 @@ void help_Readme(){
   printString("\r\n -> press [B] (Start Vibrations Scanning)\r\n");
   printString("\r\n -> press [E] (Start >[IR]< Distance Measurement)\r\n");
   printString("\r\n -> press [Q] (Start >[LASER]< Distance Scan on LIDAR)\r\n");
-  printString("\r\n -> press [L] (Start a Temperature Scan)\r\n");
+  printString("\r\n -> press [Z] (Start a Temperature Scan)\r\n");
   printString("\r\n -> press [U] (View Telemetry)\r\n");
   printString("\r\n -> press [F] (Memory Read/Write Operations)\r\n");
   printString("\r\n -> press [H] (Help/Readme)\r\n\n");
@@ -1482,6 +1524,8 @@ void help_Readme(){
   printString("\r\n -> press [9] (Recover Right-Arm from random position (arm has been touched/moved by accident in OFF state))\r\n");
   printString("\r\n -> press [Y] (Custom Servo Commands)\r\n");
   printString("\r\n -> press [k] (Park Both Arms)\r\n");
+  printString("\r\n -> press [L] (Park Left  Mecha-Arm)\r\n");
+  printString("\r\n -> press [R] (Park Right Mecha-Arm)\r\n");
   printString("\r\n -> press [SHIFT]+[-] (Activate Both Arms)\r\n");
   printString("\r\n -> press [SHIFT]+[+] (Lift-Up Both Arms)\r\n\n");
   printString("\r\n -> press [1] (Deploy Both Arms > State-1)\r\n");
@@ -2212,8 +2256,12 @@ void pcLinkSerial(void){                         // computer link!, function to 
                 case '9' :                      // apply only when right arm is streched, use this to recover from unknown states to parking
                     roboDrive_RecoverRightArm2Parking(servo_speed_mecha_arms);                 // speed >> ((superfast) 0 - 255 (very slow))
                         break;
-
-
+                case 'L' :                                      // ------------------- park arm (left) >> parked state (current draw ~ 0.6A)
+                    roboDrive_ParkLeftArm(servo_speed_mecha_arms);                             // speed >> ((superfast) 0 - 255 (very slow))
+                        break;
+                case 'R' :                                      // ------------------ park arm (right) >> parked state (current draw ~ 0.6A)
+                    roboDrive_ParkRightArm(servo_speed_mecha_arms);                            // speed >> ((superfast) 0 - 255 (very slow))
+                        break;
                 case 'k' :                                      // ------------- park arms (lef/right) >> parked state (current draw ~ 0.6A)
                     roboDrive_ParkArms(servo_speed_mecha_arms);                                // speed >> ((superfast) 0 - 255 (very slow))
                         break;
@@ -2585,7 +2633,7 @@ int main(void){
         printString("\r\n -> press [B] (Start Vibrations Scanning)\r\n");
         printString("\r\n -> press [E] (Start >[IR]< Distance Measurement)\r\n");
         printString("\r\n -> press [Q] (Start >[LASER]< Distance Scan on LIDAR)\r\n");
-        printString("\r\n -> press [L] (Start a Temperature Scan)\r\n");
+        printString("\r\n -> press [Z] (Start a Temperature Scan)\r\n");
         printString("\r\n -> press [U] (View Telemetry)\r\n");
         printString("\r\n -> press [F] (Memory Read/Write Operations)\r\n");
         printString("\r\n -> press [H] (Help/Readme)\r\n\n");
@@ -2613,6 +2661,8 @@ int main(void){
         printString("\r\n -> press [9] (Recover Right-Arm from random position (arm has been touched/moved by accident in OFF state))\r\n");
         printString("\r\n -> press [Y] (Custom Servo Commands)\r\n");
         printString("\r\n -> press [k] (Park Both Arms)\r\n");
+        printString("\r\n -> press [L] (Park Left  Mecha-Arm)\r\n");
+        printString("\r\n -> press [R] (Park Right Mecha-Arm)\r\n");
         printString("\r\n -> press [SHIFT]+[-] (Activate Both Arms)\r\n");
         printString("\r\n -> press [SHIFT]+[+] (Lift-Up Both Arms)\r\n\n");
         printString("\r\n -> press [1] (Deploy Both Arms > State-1)\r\n");

@@ -2,7 +2,7 @@
 * ------------------------------------------------- =( Physalis Labs. )= --------------------------------------------------- *
 * ---------------------------- =( Kenji-X1 Tele-Presence UGV Platform Firmware Source Code )= ------------------------------ *
 * -------------------------------------------------------------------------------------------------------------------------- *
-* --------------------------------------------- =( Firmware Version 5.7B )= ------------------------------------------------ *
+* --------------------------------------------- =( Firmware Version 5.8 )= ------------------------------------------------- *
 * ----------------------------- =( Automated UGV for Tele-Presence and Remote Operations )= -------------------------------- *
 * -------------------------------------------------------------------------------------------------------------------------- *
 * -------------------------------------------------------------------------------------------------------------------------- *
@@ -66,7 +66,7 @@
 #include <sharp_IRED_PSD_sensor.h>
 #include <vibration_sensor.h>
 //#include <Microchip_25LC256.h>                                          // currently not in use, replaced with Cypress FRAM
-#include <FM25V10.h>
+#include <FM25V10.h>                                                      // Cypress FRAM is used!
 #include <i2c.h>
 #include <util/twi.h>
 #include <lcd_display.h>
@@ -117,8 +117,8 @@ volatile short hall_S2R_pulse;                                          // varia
 volatile short hall_S2L_pulse;                                           // variables for counting Hall sensor pulses /left
 
 volatile uint16_t year_ = 2022;                                                           // variable keeps track of years
-volatile uint8_t months_ = 2;                                                            // variable keeps track of months
-volatile uint8_t days_ = 25;                                                               // variable keeps track of days
+volatile uint8_t months_ = 10;                                                            // variable keeps track of months
+volatile uint8_t days_ = 27;                                                               // variable keeps track of days
 volatile uint8_t hours_ = 12;                                                             // variable keeps track of hours
 volatile uint8_t minutes_ = 30;                                                         // variable keeps track of minutes
 volatile uint8_t seconds_ = 25;                                                         // variable keeps track of seconds
@@ -367,183 +367,186 @@ void roboDrive(char move_direction[], uint8_t speed){        // controls motors,
             }
     }
     else{}
+
     printString("\r\n roboDrive >> Servo ----------->");
     printByte(servo_number);
     printString("<--- is moved.");
+
     for(int i = 0; i <= 15; i ++ ){
-        printString("\r\n FRAM at addr ");
-        printWord(SERVOS_POSITION_ADDRESS + i);
-        printString(" stores ");
-        printByte(FRAM_readByte(SERVOS_POSITION_ADDRESS + i));
-        if (i == servo_number){
-            printString(" <--- new angle");
+      printString("\r\n FRAM at addr ");
+      printWord(SERVOS_POSITION_ADDRESS + i);
+      printString(" stores ");
+      printByte(FRAM_readByte(SERVOS_POSITION_ADDRESS + i));
+
+      if (i == servo_number){
+        printString(" <--- new angle");
         }
     }
   }
 }
 // ----------------------------------- retired Mecha-Arms Control functions (use updated ones below) ------------------------//
-void roboDrive_Arm_Stretch_clockwise(int8_t stretch_angle, uint8_t engaged_servos, uint8_t combined_angular_speed){
-
-    int8_t current_angle_arm, i;
-    if(stretch_angle > 0){
-        for(i = 0; i <= engaged_servos; i ++){
-                move_Servo_Bidirect(i, stretch_angle, combined_angular_speed, 1);
-    }
-}
-    else{
-        printString("\r\n roboDrive >> invalid stretch argument ¯\\(°_o)/¯ \r\n");
-    }
-    current_angle_arm = stretch_angle;
-    printString("\r\n roboDrive >> Arm is Stretched(clockwise)\r\n");
-}
-
-void roboDrive_Arm_Stretch_anticlockwise(int8_t stretch_angle, uint8_t engaged_servos, uint8_t combined_angular_speed){
-
-    int8_t current_angle_arm, i;
-    if(stretch_angle < 0){
-        for(i = 0; i <= engaged_servos; i ++){
-                move_Servo_Bidirect(i, stretch_angle, combined_angular_speed, 1);
-    }
-}
-    else{
-        printString("\r\n roboDrive >> invalid stretch argument ¯\\(°_o)/¯ \r\n");
-    }
-    current_angle_arm = stretch_angle;
-    printString("\r\n roboDrive >> Arm is Stretched(anti-clockwise)\r\n");
-}
-
-void roboDrive_Arm_Reset(int8_t servo_number){
-
-    if((servo_number > 15) || (servo_number < 0)) {
-        printString("\r\n roboDrive_Arm_Reset: invalid servo number ¯\\(°_o)/¯");
-    }
-    else{
-        if(FRAM_readByte(SERVOS_POSITION_ADDRESS + servo_number) != 0) {
-            move_Servo_Bidirect(servo_number, 0, 30, 1);
-            printString("\r\n roboDrive >> Servo ");
-            printByte(servo_number);
-            printString(" is reset(rdAR). Delay.\r\n");
-            _delay_ms(500);
-        }
-        else{
-            printString("\r\n roboDrive >> Servo ");
-            printByte(servo_number);
-            printString(" was already 0, no need to reset(rdAR).\r\n");
-        }
-    }
-}
-
-void roboDrive_Arm_Global_Reset(void){
-
-    uint16_t reset_time_theta = 1000;
-    printString("\r\n roboDrive >> Executing full arm reset.\r\n");
-    for(int i = 0; i <= 15; i ++){
-            roboDrive_Arm_Reset(i);
-    }
-    FRAM_writeByte(PARKING_STATE_ADDRESS, 0);                                               //write parking mode to FRAM
-    printString("\r\n roboDrive >> Arm is Reset!\r\n");
-    printString("\r\n roboDrive >> Disengaging ...\r\n");
-}
-
-void roboDrive_Claw_open(uint8_t clamp_force, int8_t clamp_angle){
-
-            move_Servo_Bidirect(6, clamp_angle, clamp_force, 1);
-            printString("\r\n roboDrive >> Claw opened...\r\n");
-}
-
-void roboDrive_Claw_close(int8_t clamp_angle, uint8_t clamp_force, uint8_t clamp_acceleration){
-
-            move_Servo_Bidirect(6, clamp_angle, clamp_force, clamp_acceleration);
-            printString("\r\n roboDrive >> Claw closed...\r\n");
-}
-
-void roboDrive_Claw_turn(int8_t claw_turn_target_angle, uint8_t claw_angular_speed, uint8_t claw_rotation_acceleration){
-
-            move_Servo_Bidirect(5, claw_turn_target_angle, claw_angular_speed, claw_rotation_acceleration);
-            printString("\r\n roboDrive >> Claw turned.\r\n");
-}
-
-void roboDrive_Arm_Park(void){
-
-            int8_t parking_state = FRAM_readByte(PARKING_STATE_ADDRESS);
-            printString("\r\nParking state is ");
-            printByte(parking_state);
-            printString(".\r\n roboDrive >> Choose mode: \r\n1 <-- Park [default arm park mode] UnPark --> 2");
-            printString("\r\n3 <-- Park [alternate arm park mode] UnPark --> 4\r\n");
-            switch (receiveByte()) {
-                    case '1':
-                            if((parking_state == 1) || (parking_state == 2)){
-                                printString("\r\n roboDrive >> Its unwise to park again when you already are parked. \r\n");
-                            }
-                            else{
-                                move_Servo_Bidirect(4, -90, 30, 1);                       // Right Arm, parking commands
-                                move_Servo_Bidirect(2, -90, 30, 1);
-                                move_Servo_Bidirect(4, 90, 30, 1);
-                                move_Servo_Bidirect(1, -90, 40, 1);
-                                move_Servo_Bidirect(3, 80, 30, 1);
-                                move_Servo_Bidirect(1, -110, 40, 1);
-
-                                // move_Servo_Bidirect(11, 90, 30, 1);                     // Left Arm, parking commands
-                                // move_Servo_Bidirect(9,  90, 30, 1);
-                                // move_Servo_Bidirect(11, -90, 30, 1);
-                                // move_Servo_Bidirect(8,  -90, 40, 1);
-                                // move_Servo_Bidirect(10, -90, 30, 1);
-                                // move_Servo_Bidirect(8, -110, 40, 1);
-
-                                FRAM_writeByte(PARKING_STATE_ADDRESS, 1);                   //write parking mode to FRAM
-                                printString("\r\n roboDrive >> Arm Parked. Parking mode: 1, default.\r\n");
-                            }
-                        break;
-                    case '2':
-                            if(parking_state != 1){
-                                printString("\r\n roboDrive >> Its unwise to run un-park 1 from any state but parked mode 1. \r\n");
-                            }
-                            else{
-                              move_Servo_Bidirect(1, -70, 40, 1);                         // Right Arm, parking commands
-                              move_Servo_Bidirect(4, -50, 30, 1);
-                              move_Servo_Bidirect(2, -40, 30, 1);
-
-                              move_Servo_Bidirect(2, 0, 30, 1);
-                              move_Servo_Bidirect(4, 0, 30, 1);
-                              move_Servo_Bidirect(3, 0, 30, 1);
-
-                              // move_Servo_Bidirect(8, 70, 40, 0);                        // Left Arm, parking commands
-                              // move_Servo_Bidirect(11, 50, 30, 0);
-                              // move_Servo_Bidirect(9, 40, 30, 1);
-                              //
-                              // move_Servo_Bidirect(9, 0, 40, 0);
-                              // move_Servo_Bidirect(11, 0, 30, 0);
-                              // move_Servo_Bidirect(10, 0, 40, 1);
-
-                                FRAM_writeByte(PARKING_STATE_ADDRESS, 0);                  // write parking mode to FRAM
-                                printString("\r\n roboDrive >> Arm UnParked from mode 1.\r\n");
-                            }
-                        break;
-                    case '3':
-                            if((parking_state == 1) || (parking_state == 2)){
-                                printString("\r\n roboDrive >> Its unwise to park again when you already are parked. \r\n");
-                            }
-                            else{
-                                move_Servo_Bidirect(4, 90, 30, 1);
-                                move_Servo_Bidirect(3, 90, 30, 1);
-                                move_Servo_Bidirect(0, -70, 30, 1);
-                                FRAM_writeByte(PARKING_STATE_ADDRESS, 2);                  //write parking mode to FRAM
-                                printString("\r\n roboDrive >> Arm Parked. Parking mode: 2, alternate.\r\n");
-                            }
-                        break;
-                    case '4':
-                            if(parking_state != 2){
-                                printString("\r\n roboDrive >> Its unwise to run un-park 2 from any state but parked mode 2. \r\n");
-                            }
-                            else{
-                                roboDrive_Arm_Global_Reset();
-                                printString("\r\n roboDrive >> Arm UnParked from mode 2. Kinda.\r\n");
-                            }
-                        break;
-                    default:
-                        printString("\r\n roboDrive >> Arm parking mode unrecognized ¯\\(°_o)/¯\r\n");
-            }
-}
+// void roboDrive_Arm_Stretch_clockwise(int8_t stretch_angle, uint8_t engaged_servos, uint8_t combined_angular_speed){
+//
+//     int8_t current_angle_arm, i;
+//     if(stretch_angle > 0){
+//         for(i = 0; i <= engaged_servos; i ++){
+//                 move_Servo_Bidirect(i, stretch_angle, combined_angular_speed, 1);
+//     }
+// }
+//     else{
+//         printString("\r\n roboDrive >> invalid stretch argument ¯\\(°_o)/¯ \r\n");
+//     }
+//     current_angle_arm = stretch_angle;
+//     printString("\r\n roboDrive >> Arm is Stretched(clockwise)\r\n");
+// }
+//
+// void roboDrive_Arm_Stretch_anticlockwise(int8_t stretch_angle, uint8_t engaged_servos, uint8_t combined_angular_speed){
+//
+//     int8_t current_angle_arm, i;
+//     if(stretch_angle < 0){
+//         for(i = 0; i <= engaged_servos; i ++){
+//                 move_Servo_Bidirect(i, stretch_angle, combined_angular_speed, 1);
+//     }
+// }
+//     else{
+//         printString("\r\n roboDrive >> invalid stretch argument ¯\\(°_o)/¯ \r\n");
+//     }
+//     current_angle_arm = stretch_angle;
+//     printString("\r\n roboDrive >> Arm is Stretched(anti-clockwise)\r\n");
+// }
+//
+// void roboDrive_Arm_Reset(int8_t servo_number){
+//
+//     if((servo_number > 15) || (servo_number < 0)) {
+//         printString("\r\n roboDrive_Arm_Reset: invalid servo number ¯\\(°_o)/¯");
+//     }
+//     else{
+//         if(FRAM_readByte(SERVOS_POSITION_ADDRESS + servo_number) != 0) {
+//             move_Servo_Bidirect(servo_number, 0, 30, 1);
+//             printString("\r\n roboDrive >> Servo ");
+//             printByte(servo_number);
+//             printString(" is reset(rdAR). Delay.\r\n");
+//             _delay_ms(500);
+//         }
+//         else{
+//             printString("\r\n roboDrive >> Servo ");
+//             printByte(servo_number);
+//             printString(" was already 0, no need to reset(rdAR).\r\n");
+//         }
+//     }
+// }
+//
+// void roboDrive_Arm_Global_Reset(void){
+//
+//     uint16_t reset_time_theta = 1000;
+//     printString("\r\n roboDrive >> Executing full arm reset.\r\n");
+//     for(int i = 0; i <= 15; i ++){
+//             roboDrive_Arm_Reset(i);
+//     }
+//     FRAM_writeByte(PARKING_STATE_ADDRESS, 0);                                               //write parking mode to FRAM
+//     printString("\r\n roboDrive >> Arm is Reset!\r\n");
+//     printString("\r\n roboDrive >> Disengaging ...\r\n");
+// }
+//
+// void roboDrive_Claw_open(uint8_t clamp_force, int8_t clamp_angle){
+//
+//             move_Servo_Bidirect(6, clamp_angle, clamp_force, 1);
+//             printString("\r\n roboDrive >> Claw opened...\r\n");
+// }
+//
+// void roboDrive_Claw_close(int8_t clamp_angle, uint8_t clamp_force, uint8_t clamp_acceleration){
+//
+//             move_Servo_Bidirect(6, clamp_angle, clamp_force, clamp_acceleration);
+//             printString("\r\n roboDrive >> Claw closed...\r\n");
+// }
+//
+// void roboDrive_Claw_turn(int8_t claw_turn_target_angle, uint8_t claw_angular_speed, uint8_t claw_rotation_acceleration){
+//
+//             move_Servo_Bidirect(5, claw_turn_target_angle, claw_angular_speed, claw_rotation_acceleration);
+//             printString("\r\n roboDrive >> Claw turned.\r\n");
+// }
+//
+// void roboDrive_Arm_Park(void){
+//
+//             int8_t parking_state = FRAM_readByte(PARKING_STATE_ADDRESS);
+//             printString("\r\nParking state is ");
+//             printByte(parking_state);
+//             printString(".\r\n roboDrive >> Choose mode: \r\n1 <-- Park [default arm park mode] UnPark --> 2");
+//             printString("\r\n3 <-- Park [alternate arm park mode] UnPark --> 4\r\n");
+//             switch (receiveByte()) {
+//                     case '1':
+//                             if((parking_state == 1) || (parking_state == 2)){
+//                                 printString("\r\n roboDrive >> Its unwise to park again when you already are parked. \r\n");
+//                             }
+//                             else{
+//                                 move_Servo_Bidirect(4, -90, 30, 1);                       // Right Arm, parking commands
+//                                 move_Servo_Bidirect(2, -90, 30, 1);
+//                                 move_Servo_Bidirect(4, 90, 30, 1);
+//                                 move_Servo_Bidirect(1, -90, 40, 1);
+//                                 move_Servo_Bidirect(3, 80, 30, 1);
+//                                 move_Servo_Bidirect(1, -110, 40, 1);
+//
+//                                 // move_Servo_Bidirect(11, 90, 30, 1);                     // Left Arm, parking commands
+//                                 // move_Servo_Bidirect(9,  90, 30, 1);
+//                                 // move_Servo_Bidirect(11, -90, 30, 1);
+//                                 // move_Servo_Bidirect(8,  -90, 40, 1);
+//                                 // move_Servo_Bidirect(10, -90, 30, 1);
+//                                 // move_Servo_Bidirect(8, -110, 40, 1);
+//
+//                                 FRAM_writeByte(PARKING_STATE_ADDRESS, 1);                   //write parking mode to FRAM
+//                                 printString("\r\n roboDrive >> Arm Parked. Parking mode: 1, default.\r\n");
+//                             }
+//                         break;
+//                     case '2':
+//                             if(parking_state != 1){
+//                                 printString("\r\n roboDrive >> Its unwise to run un-park 1 from any state but parked mode 1. \r\n");
+//                             }
+//                             else{
+//                               move_Servo_Bidirect(1, -70, 40, 1);                         // Right Arm, parking commands
+//                               move_Servo_Bidirect(4, -50, 30, 1);
+//                               move_Servo_Bidirect(2, -40, 30, 1);
+//
+//                               move_Servo_Bidirect(2, 0, 30, 1);
+//                               move_Servo_Bidirect(4, 0, 30, 1);
+//                               move_Servo_Bidirect(3, 0, 30, 1);
+//
+//                               // move_Servo_Bidirect(8, 70, 40, 0);                        // Left Arm, parking commands
+//                               // move_Servo_Bidirect(11, 50, 30, 0);
+//                               // move_Servo_Bidirect(9, 40, 30, 1);
+//                               //
+//                               // move_Servo_Bidirect(9, 0, 40, 0);
+//                               // move_Servo_Bidirect(11, 0, 30, 0);
+//                               // move_Servo_Bidirect(10, 0, 40, 1);
+//
+//                                 FRAM_writeByte(PARKING_STATE_ADDRESS, 0);                  // write parking mode to FRAM
+//                                 printString("\r\n roboDrive >> Arm UnParked from mode 1.\r\n");
+//                             }
+//                         break;
+//                     case '3':
+//                             if((parking_state == 1) || (parking_state == 2)){
+//                                 printString("\r\n roboDrive >> Its unwise to park again when you already are parked. \r\n");
+//                             }
+//                             else{
+//                                 move_Servo_Bidirect(4, 90, 30, 1);
+//                                 move_Servo_Bidirect(3, 90, 30, 1);
+//                                 move_Servo_Bidirect(0, -70, 30, 1);
+//                                 FRAM_writeByte(PARKING_STATE_ADDRESS, 2);                  //write parking mode to FRAM
+//                                 printString("\r\n roboDrive >> Arm Parked. Parking mode: 2, alternate.\r\n");
+//                             }
+//                         break;
+//                     case '4':
+//                             if(parking_state != 2){
+//                                 printString("\r\n roboDrive >> Its unwise to run un-park 2 from any state but parked mode 2. \r\n");
+//                             }
+//                             else{
+//                                 roboDrive_Arm_Global_Reset();
+//                                 printString("\r\n roboDrive >> Arm UnParked from mode 2. Kinda.\r\n");
+//                             }
+//                         break;
+//                     default:
+//                         printString("\r\n roboDrive >> Arm parking mode unrecognized ¯\\(°_o)/¯\r\n");
+//             }
+// }
 
 void roboDrive_Arm_Testing(void){
 
@@ -612,6 +615,33 @@ void roboDrive_RecoverArms2Parking(uint8_t recover_speed){
   move_Servo_Bidirect(8,    0,  recover_speed, 1);
   move_Servo_Bidirect(12,   0,  recover_speed, 1);
   move_Servo_Bidirect(13, -20,  recover_speed, 1);
+}
+
+void roboDrive_RecoverLeftArm2Parking(uint8_t recover_speed){
+                                              // apply only when arm is streched, use to recover from unknown states to parking
+// -------------------------------------------------- // Left mecha arm op-codes, // speed >> ((superfast) 1 - 255 (very slow))
+// ------------------------------------------------------------------------------------------------------------------------- //
+// ------------------------------------------------------------------------------------------------- // left mecha-arm op-codes
+  move_Servo_Bidirect(7,    0,  recover_speed, 1);
+  move_Servo_Bidirect(11,   0,  recover_speed, 1);
+  move_Servo_Bidirect(10,   0,  recover_speed, 1);
+  move_Servo_Bidirect(9,    0,  recover_speed, 1);
+  move_Servo_Bidirect(8,    0,  recover_speed, 1);
+  move_Servo_Bidirect(12,   0,  recover_speed, 1);
+  move_Servo_Bidirect(13, -20,  recover_speed, 1);
+}
+
+void roboDrive_RecoverRightArm2Parking(uint8_t recover_speed){
+                                              // apply only when arm is streched, use to recover from unknown states to parking
+// ------------------------------------------------- // right mecha arm op-codes, // speed >> ((superfast) 1 - 255 (very slow))
+// ------------------------------------------------------------------------------------------------------------------------- //
+  move_Servo_Bidirect(0,  0,  recover_speed, 1);
+  move_Servo_Bidirect(4,  0,  recover_speed, 1);
+  move_Servo_Bidirect(3,  0,  recover_speed, 1);
+  move_Servo_Bidirect(2,  0,  recover_speed, 1);
+  move_Servo_Bidirect(1,  0,  recover_speed, 1);
+  move_Servo_Bidirect(5,  0,  recover_speed, 1);
+  move_Servo_Bidirect(6, 30,  recover_speed, 1);
 }
 
 void roboDrive_ParkArms(uint8_t parking_speed){
@@ -691,7 +721,7 @@ void roboDrive_DeployArmsState3(uint8_t deploy_speed){
 
   move_Servo_Bidirect(5,  0,   deploy_speed, 1);
   move_Servo_Bidirect(6, 40,   deploy_speed, 1);
-// --------------------------------------------------------------------------------------------- //  left mecha arm op-codes
+// -------------------------------------------------------------------------------------------------- //  left mecha arm op-codes
   move_Servo_Bidirect(7,   0,  deploy_speed, 1);
   move_Servo_Bidirect(11, 90,  deploy_speed, 1);
   move_Servo_Bidirect(9,   0,  deploy_speed, 1);
@@ -703,42 +733,15 @@ void roboDrive_DeployArmsState3(uint8_t deploy_speed){
 }
 
 void roboDrive_ActivateArms(uint8_t activation_speed){
-                                     // -activate arms from parked state ((lef/right) >> state 4 (current draw ~ 0.68-0.70A)
-// ---------------------------------------------- - // right mecha arm op-code,// speed >> ((superfast) 0 - 255 (very slow))
+                                     //- activate both arms from parked state ((lef/right) >> state 4 (current draw ~ 0.68-0.70A)
+// ----------------------------------------------- // right mecha arm op-code,      // speed >> ((superfast) 0 - 255 (very slow))
   move_Servo_Bidirect(0, -10, activation_speed, 1);
   move_Servo_Bidirect(4, 105, activation_speed, 1);
   move_Servo_Bidirect(2, -45, activation_speed, 1);
-// ------------------------------------------------------------------------------------------ -- //  left mecha arm op-codes
+// ------------------------------------------------------------------------------------------------- //  left mecha arm op-codes
   move_Servo_Bidirect(7,    0, activation_speed, 1);
   move_Servo_Bidirect(11, 115, activation_speed, 1);
   move_Servo_Bidirect(9,  -36, activation_speed, 1);
-}
-
-void roboDrive_LiftUpArms(uint8_t speed){
-                            // ------------- lift-up arms (^_^) show-off ((lef/right) >> state 4 (current draw ~ 0.68-0.70A)
-// ------------------------------------------------ // right mecha-arm op-code,   speed >> ((superfast) 0 - 255 (very slow))
-  move_Servo_Bidirect(0, -10, speed, 1);
-  move_Servo_Bidirect(4, 105, speed, 1);
-  move_Servo_Bidirect(2,   0, speed, 1);
-  move_Servo_Bidirect(1, -90, speed, 1);
-  move_Servo_Bidirect(3,  -8, speed, 1);
-  move_Servo_Bidirect(4,   0, speed, 1);
-// ----------- waive mecha-arm ------------------------------------------------------------------------------------------//
-  move_Servo_Bidirect(0,  45, speed, 1);
-  move_Servo_Bidirect(0, -10, speed, 1);
-  move_Servo_Bidirect(0,  45, speed, 1);
-  move_Servo_Bidirect(0, -10, speed, 1);
-// ----------- nodd tower ----------------------------------------------------------------------------------------------//
-  roboDrive_LookUp(speed);
-  roboDrive_LookDown(speed);
-  roboDrive_LookUpFront(speed);
-// ------------------------------------------------------------------------------------------- //  left mecha arm op-codes
-  move_Servo_Bidirect(7,   0,  speed, 1);
-  move_Servo_Bidirect(11, 115, speed, 1);
-  move_Servo_Bidirect(9,    0, speed, 1);
-  move_Servo_Bidirect(8,   76, speed, 1);
-  move_Servo_Bidirect(10,   0, speed, 1);
-  move_Servo_Bidirect(11,   0, speed, 1);
 }
 
 void roboDrive_LookUp(uint8_t speed){
@@ -782,6 +785,33 @@ void roboDrive_LookDown(uint8_t speed){
 void roboDrive_LookUpFront(uint8_t speed){
                                                                               // speed >> ((superfast) 1 - 255 (very slow))
   move_Servo_Bidirect(14, 10, speed, 1);
+}
+
+void roboDrive_LiftUpArms(uint8_t speed){
+                            // ------------- lift-up arms (^_^) show-off ((lef/right) >> state 4 (current draw ~ 0.68-0.70A)
+// ------------------------------------------------ // right mecha-arm op-code,   speed >> ((superfast) 0 - 255 (very slow))
+  move_Servo_Bidirect(0, -10, speed, 1);
+  move_Servo_Bidirect(4, 105, speed, 1);
+  move_Servo_Bidirect(2,   0, speed, 1);
+  move_Servo_Bidirect(1, -90, speed, 1);
+  move_Servo_Bidirect(3,  -8, speed, 1);
+  move_Servo_Bidirect(4,   0, speed, 1);
+// ----------- waive mecha-arm ------------------------------------------------------------------------------------------//
+  move_Servo_Bidirect(0,  45, speed, 1);
+  move_Servo_Bidirect(0, -10, speed, 1);
+  move_Servo_Bidirect(0,  45, speed, 1);
+  move_Servo_Bidirect(0, -10, speed, 1);
+// ----------- nodd tower ----------------------------------------------------------------------------------------------//
+  roboDrive_LookUp(speed);
+  roboDrive_LookDown(speed);
+  roboDrive_LookUpFront(speed);
+// ------------------------------------------------------------------------------------------- //  left mecha arm op-codes
+  move_Servo_Bidirect(7,   0,  speed, 1);
+  move_Servo_Bidirect(11, 115, speed, 1);
+  move_Servo_Bidirect(9,    0, speed, 1);
+  move_Servo_Bidirect(8,   76, speed, 1);
+  move_Servo_Bidirect(10,   0, speed, 1);
+  move_Servo_Bidirect(11,   0, speed, 1);
 }
 
 void roboDrive_move_Forward_LeftMechaArm(uint8_t speed){
@@ -976,7 +1006,6 @@ void roboDrive_Crane_RightArm(uint8_t speed){
   }
 }
 
-
 void roboDrive_move_RightMechaArm_CW(uint8_t speed){
 
   uint8_t step = 5;
@@ -1001,7 +1030,7 @@ void roboDrive_move_RightMechaArm_CCW(uint8_t speed){
   }
 }
 
-void roboDrive_move_LeftMechaArm_CW(speed){
+void roboDrive_move_LeftMechaArm_CW(uint8_t speed){
 
   uint8_t step = 5;
   uint8_t servo_number = 7;
@@ -1013,7 +1042,7 @@ void roboDrive_move_LeftMechaArm_CW(speed){
   }
 }
 
-void roboDrive_move_LeftMechaArm_CCW(speed){
+void roboDrive_move_LeftMechaArm_CCW(uint8_t speed){
 
   uint8_t step = 5;
   uint8_t servo_number = 7;
@@ -1414,7 +1443,7 @@ void help_Readme(){
 
   lcd_clear();
   lcd_home();
-  lcd_print_str("roboDrive 5.7_B ");
+  lcd_print_str("roboDrive 5.8 ");
   lcd_print_str("Help / Readme");
 
   printString("\r\n\n ---> [roboDrive Engine Instruction set] <---\r\n");
@@ -1422,19 +1451,21 @@ void help_Readme(){
   printString("\r\n   -------  > Run Control < ----------------------\r\n");
   printString("\r\n -> press [T] (Update Time/Date)\r\n");
   printString("\r\n -> press [O] (Configure Kinetics and Parameters)\r\n");
-  printString("\r\n -> press [V] (Start Vibrations Scanning)\r\n");
+  printString("\r\n -> press [B] (Start Vibrations Scanning)\r\n");
   printString("\r\n -> press [E] (Start >[IR]< Distance Measurement)\r\n");
   printString("\r\n -> press [Q] (Start >[LASER]< Distance Scan on LIDAR)\r\n");
   printString("\r\n -> press [L] (Start a Temperature Scan)\r\n");
   printString("\r\n -> press [U] (View Telemetry)\r\n");
   printString("\r\n -> press [F] (Memory Read/Write Operations)\r\n");
   printString("\r\n -> press [H] (Help/Readme)\r\n\n");
+  printString("\r\n   --------------------------------------------\r\n");
   printString("\r\n   -------  > Drivetrain Control < ----------------------\r\n");
   printString("\r\n -> press [W] (Forward Drive)\r\n");
   printString("\r\n -> press [S] (Reverse Drive/Go-Back)\r\n");
   printString("\r\n -> press [A] (Turn Left)\r\n");
   printString("\r\n -> press [D] (Turn Right)\r\n");
   printString("\r\n -> press [X] (Stop|Brake)\r\n\n");
+  printString("\r\n   --------------------------------------------\r\n");
   printString("\r\n   -------  > Tower Control < ----------------------------\r\n");
   printString("\r\n -> press [4] (Look Left)\r\n");
   printString("\r\n -> press [6] (Look Right)\r\n");
@@ -1444,8 +1475,11 @@ void help_Readme(){
   printString("\r\n -> press [SHIFT]+[*] (Light OFF)\r\n");
   printString("\r\n -> press [SHIFT]+[/] (Light ON)\r\n\n");
   printString("\r\n -> cycle [SHIFT]+[/] with [SHIFT]+[*] (Mode Change)\r\n\n");
+  printString("\r\n   --------------------------------------------\r\n");
   printString("\r\n   -------  > Manipulator Control < ----------------------\r\n");
   printString("\r\n -> press [#] (Recover Both Arms from random position)\r\n");
+  printString("\r\n -> press [7] (Recover Left-Arm  from random position (arm has been touched/moved by accident in OFF state))\r\n");
+  printString("\r\n -> press [9] (Recover Right-Arm from random position (arm has been touched/moved by accident in OFF state))\r\n");
   printString("\r\n -> press [Y] (Custom Servo Commands)\r\n");
   printString("\r\n -> press [k] (Park Both Arms)\r\n");
   printString("\r\n -> press [SHIFT]+[-] (Activate Both Arms)\r\n");
@@ -1454,20 +1488,21 @@ void help_Readme(){
   printString("\r\n -> press [2] (Deploy Both Arms > State-2)\r\n");
   printString("\r\n -> press [3] (Deploy Both Arms > State-3)\r\n");
   printString("\r\n -> press [c] (Steer Left Mecha-Arm CW)\r\n");
-  printString("\r\n -> press [b] (Steer Left Mecha-Arm CCW)\r\n");
+  printString("\r\n -> press [v] (Steer Left Mecha-Arm CCW)\r\n");
   printString("\r\n -> press [n] (Steer Right Mecha-Arm CW)\r\n");
   printString("\r\n -> press [m] (Steer Right Mecha-Arm CCW)\r\n");
   printString("\r\n -> press [e] (Extend Forward >> Gradually Left  Mecha-Arm )\r\n");
   printString("\r\n -> press [r] (Crane Backward >> Gradually Left  Mecha-Arm )\r\n");
   printString("\r\n -> press [o] (Extend Forward >> Gradually Right Mecha-Arm )\r\n");
   printString("\r\n -> press [p] (Crane Backward >> Gradually Right Mecha-Arm )\r\n");
+  printString("\r\n   --------------------------------------------\r\n");
   printString("\r\n   -------  > Gripper Control < --------------------------\r\n");
   printString("\r\n -> press [d] (Open  Gradually >> Left  Gripper)\r\n");
   printString("\r\n -> press [f] (Close Gradually >> Left  Gripper)\r\n");
   printString("\r\n -> press [h] (Open  Gradually >> Right Gripper)\r\n");
   printString("\r\n -> press [j] (Close Gradually >> Right Gripper)\r\n");
   printString("\r\n -> press [C] (Rotate Left  Mecha-Arm Gripper CW )\r\n");
-  printString("\r\n -> press [B] (Rotate Left  Mecha-Arm Gripper CCW)\r\n");
+  printString("\r\n -> press [V] (Rotate Left  Mecha-Arm Gripper CCW)\r\n");
   printString("\r\n -> press [N] (Rotate Right Mecha-Arm Gripper CW )\r\n");
   printString("\r\n -> press [M] (Rotate Right Mecha-Arm Gripper CCW)\r\n");
   printString("\r\n   -------------------------------------------------------\r\n");
@@ -1659,7 +1694,7 @@ void set_Time(void){
   _delay_ms(50);
   playNote(notes[15], currentNoteLength);
   _delay_ms(1000);
-  printString("\r\n>> connected to [Physalis_Geo-Lab]...\r\n");
+  printString("\r\n>> connected to [Kenji-X1]...\r\n");
   printString("\r\n-------------------------------\r\n");
   printString(">> setting date/time...\r\n");
   playNote(notes[15], currentNoteLength);
@@ -1696,8 +1731,8 @@ void set_Time(void){
   playNote(notes[15], currentNoteLength);
   sys_tick = 0;
   printString("\r\n");
-  printString("\r\n>> robo-Drive: time/date successfully updated! \r\n");
-  printString(">> robo-Drive: thank you\r\n");
+  printString("\r\n>> roboDrive: time/date successfully updated! \r\n");
+  printString(">> roboDrive: thank you\r\n");
   lcd_clear();
   lcd_home();
   lcd_print_str("> done!");
@@ -1787,18 +1822,18 @@ void vibration_Scanning(void){
   playNote(notes[0],  currentNoteLength);
   playNote(notes[2],  currentNoteLength);
   playNote(notes[10], currentNoteLength);
-  printString("\r\n>> connected to [Physalis_Geo-Lab]...\r\n");
+  printString("\r\n>> connected to [Kenji-X1]...\r\n");
   printString("\r\n-------------------------------\r\n");
-  printString(">> robo-Drive: [vibrations scanner]\r\n");
+  printString(">> roboDrive: [vibrations scanner]\r\n");
   playNote(notes[15], currentNoteLength);
-  printString("robo-Drive: system ready ... \r\n");
+  printString("roboDrive: system ready ... \r\n");
   playNote(notes[15], currentNoteLength);
   printString("start a measurement? (y/n)\r\n");
   user_input = receiveByte();
   playNote(notes[15], currentNoteLength);
   if(user_input == 'y'){
-    printString(">> robo-Drive: pre-start warm-up... \r\n");
-    printString(">> robo-Drive: enter number of cycles: (1-99999)\r\n");
+    printString(">> roboDrive: pre-start warm-up... \r\n");
+    printString(">> roboDrive: enter number of cycles: (1-99999)\r\n");
     playNote(notes[15], currentNoteLength);
     test_cycle_num = get_32BitNumber();
     printString("\nyou entered : ");
@@ -1816,7 +1851,7 @@ void vibration_Scanning(void){
       printWord_32(theta_1);
       printString("\r\n");
     }
-    printString("\r\n>> robo-Drive: scan complete!\r\n");
+    printString("\r\n>> roboDrive: scan complete!\r\n");
     lcd_clear();
     lcd_home();
     lcd_print_str("> scan complete");
@@ -2171,6 +2206,14 @@ void pcLinkSerial(void){                         // computer link!, function to 
                 case '#' :                     // apply only when both arms are streched, use this to recover from unknown states to parking
                     roboDrive_RecoverArms2Parking(servo_speed_mecha_arms);                     // speed >> ((superfast) 0 - 255 (very slow))
                         break;
+                case '7' :                       // apply only when left arm is streched, use this to recover from unknown states to parking
+                    roboDrive_RecoverLeftArm2Parking(servo_speed_mecha_arms);                  // speed >> ((superfast) 0 - 255 (very slow))
+                        break;
+                case '9' :                      // apply only when right arm is streched, use this to recover from unknown states to parking
+                    roboDrive_RecoverRightArm2Parking(servo_speed_mecha_arms);                 // speed >> ((superfast) 0 - 255 (very slow))
+                        break;
+
+
                 case 'k' :                                      // ------------- park arms (lef/right) >> parked state (current draw ~ 0.6A)
                     roboDrive_ParkArms(servo_speed_mecha_arms);                                // speed >> ((superfast) 0 - 255 (very slow))
                         break;
@@ -2208,7 +2251,7 @@ void pcLinkSerial(void){                         // computer link!, function to 
                 case 'C' :                                   // ------------- rotate CW [gripper] on RIGHT mech-arm >> (current draw ~ 0. A)
                      roboDrive_Rotate_CW_GripperLeftMechaArm(servo_speed_rotation_grippers);   // speed >> ((superfast) 0 - 255 (very slow))
                         break;
-                case 'B' :                                                // rotate CCW [gripper] on RIGHT mech-arm >> (current draw ~ 0. A)
+                case 'V' :                                                // rotate CCW [gripper] on RIGHT mech-arm >> (current draw ~ 0. A)
                     roboDrive_Rotate_CCW_GripperLeftMechaArm(servo_speed_rotation_grippers);   // speed >> ((superfast) 0 - 255 (very slow))
                         break;
                 case 'N' :                                    // ------------- rotate CW [gripper] on LEFT mech-arm >> (current draw ~ 0. A)
@@ -2223,7 +2266,7 @@ void pcLinkSerial(void){                         // computer link!, function to 
                 case 'c' :                                          // ------------- [STEER >> CW] [RIGHT] mech-arm >> (current draw ~ 0. A)
                      roboDrive_move_LeftMechaArm_CW(servo_speed_turning_mecha_arms);           // speed >> ((superfast) 0 - 255 (very slow))
                         break;
-                case 'b' :                                         // ------------- [STEER >> CCW] [RIGHT] mech-arm >> (current draw ~ 0. A)
+                case 'v' :                                         // ------------- [STEER >> CCW] [RIGHT] mech-arm >> (current draw ~ 0. A)
                     roboDrive_move_LeftMechaArm_CCW(servo_speed_turning_mecha_arms);           // speed >> ((superfast) 0 - 255 (very slow))
                         break;
                 case 'n' :                                           // ------------- [STEER >> CW] [LEFT] mech-arm >> (current draw ~ 0. A)
@@ -2244,7 +2287,7 @@ void pcLinkSerial(void){                         // computer link!, function to 
                 case 'p' :                      // ------------- cranes mecha-arm step by step up >> Lifts-up (right), (current draw ~ 0. A)
                     roboDrive_Crane_RightArm(35);                                              // speed >> ((superfast) 0 - 255 (very slow))
                        break;
-                case 'V' :
+                case 'B' :
                     vibration_Scanning();
                         break;
                 case 'L' :
@@ -2515,7 +2558,7 @@ int main(void){
 //            playNote(notes[i+1], currentNoteLength);
 //            _delay_ms(200);
 //        }
-//        playNote(notes[15], currentNoteLength);                               // sound tones played during system initialization
+//        playNote(notes[15], currentNoteLength);                              // sound tones played during system initialization
 //        _delay_ms(200);
 //        playNote(notes[4], currentNoteLength);
 //        _delay_ms(150);
@@ -2530,30 +2573,30 @@ int main(void){
 //        playNote(notes[16], currentNoteLength);
 //        _delay_ms(200);
 //        playNote(notes[15], currentNoteLength);
-        printString("\r\n\n   -------  [Kenji-X1] / Firmware Version 5.7B \r\n\n");                         // version control
+        printString("\r\n\n -------  [Kenji-X1] / Firmware Version 5.8 \r\n\n");                            // version control
         printString("   -------  Compiled on: " __DATE__" / "__TIME__" \r\n\n");                        // Build Date and Time
         printString("   -------  Platform Status: [in development] ... \r\n\n");                    // Platform current status
         //printString("\r\n    -------  > roboDrive Instruction set <-------\r\n");                      // roboDrive OP-codes
-        printString("\r\n\n   ---> [roboDrive Engine Instruction set] <---\r\n");
-        printString("\r\n   --------------------------------------------\r\n\n");
-        //printString("\r\n   -------- > roboDrive Instructions <---------\r\n");
+        printString("\r\n\n ---> [roboDrive Engine Instruction set] <---\r\n");
         printString("\r\n   --------------------------------------------\r\n");
         printString("\r\n   -------  > Run Control < ----------------------\r\n");
         printString("\r\n -> press [T] (Update Time/Date)\r\n");
         printString("\r\n -> press [O] (Configure Kinetics and Parameters)\r\n");
-        printString("\r\n -> press [V] (Start Vibrations Scanning)\r\n");
+        printString("\r\n -> press [B] (Start Vibrations Scanning)\r\n");
         printString("\r\n -> press [E] (Start >[IR]< Distance Measurement)\r\n");
         printString("\r\n -> press [Q] (Start >[LASER]< Distance Scan on LIDAR)\r\n");
         printString("\r\n -> press [L] (Start a Temperature Scan)\r\n");
         printString("\r\n -> press [U] (View Telemetry)\r\n");
         printString("\r\n -> press [F] (Memory Read/Write Operations)\r\n");
         printString("\r\n -> press [H] (Help/Readme)\r\n\n");
+        printString("\r\n   --------------------------------------------\r\n");
         printString("\r\n   -------  > Drivetrain Control < ----------------------\r\n");
         printString("\r\n -> press [W] (Forward Drive)\r\n");
         printString("\r\n -> press [S] (Reverse Drive/Go-Back)\r\n");
         printString("\r\n -> press [A] (Turn Left)\r\n");
         printString("\r\n -> press [D] (Turn Right)\r\n");
         printString("\r\n -> press [X] (Stop|Brake)\r\n\n");
+        printString("\r\n   --------------------------------------------\r\n");
         printString("\r\n   -------  > Tower Control < ----------------------------\r\n");
         printString("\r\n -> press [4] (Look Left)\r\n");
         printString("\r\n -> press [6] (Look Right)\r\n");
@@ -2563,8 +2606,11 @@ int main(void){
         printString("\r\n -> press [SHIFT]+[*] (Light OFF)\r\n");
         printString("\r\n -> press [SHIFT]+[/] (Light ON)\r\n\n");
         printString("\r\n -> cycle [SHIFT]+[/] with [SHIFT]+[*] (Mode Change)\r\n\n");
+        printString("\r\n   --------------------------------------------\r\n");
         printString("\r\n   -------  > Manipulator Control < ----------------------\r\n");
-        printString("\r\n -> press [#] (Recover Both Arms from X-State for Parking)\r\n");
+        printString("\r\n -> press [#] (Recover Both Arms from random position)\r\n");
+        printString("\r\n -> press [7] (Recover Left-Arm  from random position (arm has been touched/moved by accident in OFF state))\r\n");
+        printString("\r\n -> press [9] (Recover Right-Arm from random position (arm has been touched/moved by accident in OFF state))\r\n");
         printString("\r\n -> press [Y] (Custom Servo Commands)\r\n");
         printString("\r\n -> press [k] (Park Both Arms)\r\n");
         printString("\r\n -> press [SHIFT]+[-] (Activate Both Arms)\r\n");
@@ -2573,20 +2619,21 @@ int main(void){
         printString("\r\n -> press [2] (Deploy Both Arms > State-2)\r\n");
         printString("\r\n -> press [3] (Deploy Both Arms > State-3)\r\n");
         printString("\r\n -> press [c] (Steer Left Mecha-Arm CW)\r\n");
-        printString("\r\n -> press [b] (Steer Left Mecha-Arm CCW)\r\n");
+        printString("\r\n -> press [v] (Steer Left Mecha-Arm CCW)\r\n");
         printString("\r\n -> press [n] (Steer Right Mecha-Arm CW)\r\n");
         printString("\r\n -> press [m] (Steer Right Mecha-Arm CCW)\r\n");
         printString("\r\n -> press [e] (Extend Forward >> Gradually Left  Mecha-Arm )\r\n");
         printString("\r\n -> press [r] (Crane Backward >> Gradually Left  Mecha-Arm )\r\n");
         printString("\r\n -> press [o] (Extend Forward >> Gradually Right Mecha-Arm )\r\n");
         printString("\r\n -> press [p] (Crane Backward >> Gradually Right Mecha-Arm )\r\n");
+        printString("\r\n   --------------------------------------------\r\n");
         printString("\r\n   -------  > Gripper Control < --------------------------\r\n");
         printString("\r\n -> press [d] (Open  Gradually >> Left  Gripper)\r\n");
         printString("\r\n -> press [f] (Close Gradually >> Left  Gripper)\r\n");
         printString("\r\n -> press [h] (Open  Gradually >> Right Gripper)\r\n");
         printString("\r\n -> press [j] (Close Gradually >> Right Gripper)\r\n");
         printString("\r\n -> press [C] (Rotate Left  Mecha-Arm Gripper CW )\r\n");
-        printString("\r\n -> press [B] (Rotate Left  Mecha-Arm Gripper CCW)\r\n");
+        printString("\r\n -> press [V] (Rotate Left  Mecha-Arm Gripper CCW)\r\n");
         printString("\r\n -> press [N] (Rotate Right Mecha-Arm Gripper CW )\r\n");
         printString("\r\n -> press [M] (Rotate Right Mecha-Arm Gripper CCW)\r\n");
         printString("\r\n   -------------------------------------------------------\r\n");
@@ -2596,8 +2643,8 @@ int main(void){
         for(int psi = 0 ; psi < 10; psi ++)
             {
                 lcd_home();
-                lcd_print_str(" Physalis  Labs ");
-                lcd_print_str("roboDrive v_5.7B");
+                lcd_print_str(" Physalis Labs  ");
+                lcd_print_str("roboDrive v_5.8");
                 pcf8575_Output(0b0000000000000000);    // I2C port expander's Ports(0-7) as input, Ports(10-17) as output
                 playNote(notes[psi], currentNoteLength);
                 _delay_ms(50);

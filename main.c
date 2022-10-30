@@ -757,11 +757,9 @@ void roboDrive_ParkLeft_Arm_fromState4x(uint8_t parking_speed){
                                                      // ---------- park Left-MechaArm (left) >> parked state (current draw ~ 0.6A)
 // ------------------------------------------------------- // Left-MechaArm op-codes // speed >> ((superfast) 1 - 255 (very slow))
 
-// move_Servo_Bidirect(13, -25,  parking_speed, 1);
-// move_Servo_Bidirect(12,   0,  parking_speed, 1);
-  move_Servo_Bidirect(7,  0,   parking_speed, 1);
-  move_Servo_Bidirect(13, 10,  parking_speed, 1);
+  move_Servo_Bidirect(13, -25, parking_speed, 1);
   move_Servo_Bidirect(12, 0,   parking_speed, 1);
+  move_Servo_Bidirect(7,  0,   parking_speed, 1);
   move_Servo_Bidirect(10, 0,   parking_speed, 1);
   move_Servo_Bidirect(11, 0,   parking_speed, 1);
   move_Servo_Bidirect(8,  90,  parking_speed, 1);

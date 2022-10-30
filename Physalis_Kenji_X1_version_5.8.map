@@ -1626,7 +1626,7 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0xb3fc
+.debug_info     0x00000000     0xb3fd
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x792 d:/users/arhitect/documents/avr8-gnu-toolchain-3.6.2.1759-win32.any.x86/avr8-gnu-toolchain-win32_x86/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr51/crtatmega1284p.o
  .debug_info    0x00000792      0x11f battery_pack.o
@@ -1635,12 +1635,12 @@ END GROUP
  .debug_info    0x00000f57      0x666 Garmin_LIDAR_Lite_v3HP.o
  .debug_info    0x000015bd      0x15f i2c.o
  .debug_info    0x0000171c      0x875 lcd_display.o
- .debug_info    0x00001f91     0x84ff main.o
- .debug_info    0x0000a490      0x402 PCA9685_PWM_Controller.o
- .debug_info    0x0000a892      0x2bd PCF8575_i2c_Expander.o
- .debug_info    0x0000ab4f       0xe2 sharp_IRED_PSD_sensor.o
- .debug_info    0x0000ac31      0x20a stepper_motor.o
- .debug_info    0x0000ae3b      0x5c1 USART.o
+ .debug_info    0x00001f91     0x8500 main.o
+ .debug_info    0x0000a491      0x402 PCA9685_PWM_Controller.o
+ .debug_info    0x0000a893      0x2bd PCF8575_i2c_Expander.o
+ .debug_info    0x0000ab50       0xe2 sharp_IRED_PSD_sensor.o
+ .debug_info    0x0000ac32      0x20a stepper_motor.o
+ .debug_info    0x0000ae3c      0x5c1 USART.o
 
 .debug_abbrev   0x00000000     0x174a
  *(.debug_abbrev)

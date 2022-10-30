@@ -760,6 +760,8 @@ void roboDrive_ParkLeft_Arm_fromState4x(uint8_t parking_speed){
 // move_Servo_Bidirect(13, -25,  parking_speed, 1);
 // move_Servo_Bidirect(12,   0,  parking_speed, 1);
   move_Servo_Bidirect(7,  0,   parking_speed, 1);
+  move_Servo_Bidirect(13, 10,  parking_speed, 1);
+  move_Servo_Bidirect(12, 0,   parking_speed, 1);
   move_Servo_Bidirect(10, 0,   parking_speed, 1);
   move_Servo_Bidirect(11, 0,   parking_speed, 1);
   move_Servo_Bidirect(8,  90,  parking_speed, 1);
@@ -771,8 +773,6 @@ void roboDrive_ParkLeft_Arm_fromState4x(uint8_t parking_speed){
   move_Servo_Bidirect(8,  110, parking_speed, 1);
   move_Servo_Bidirect(11, 125, parking_speed, 1);
   move_Servo_Bidirect(10, 54,  parking_speed, 1);
-  move_Servo_Bidirect(13, 10,  parking_speed, 1);
-  move_Servo_Bidirect(12, 0,   parking_speed, 1);
 
   // move_Servo_Bidirect(7,   0,   parking_speed, 1);
   // move_Servo_Bidirect(9, -70,   parking_speed, 1);

@@ -736,7 +736,34 @@ void roboDrive_DeployRight_Arm_State1(uint8_t deploy_speed){
   move_Servo_Bidirect(5,  0,   deploy_speed, 1);
   move_Servo_Bidirect(6, 30,   deploy_speed, 1);
 }
+//----------------working here
+void roboDrive_DeployLeft_Arm_State4x(uint8_t deploy_speed){
+                                                     // ---------- park Left-MechaArm (left) >> parked state (current draw ~ 0.6A)
+// ------------------------------------------------------- // Left-MechaArm op-codes // speed >> ((superfast) 1 - 255 (very slow))
+  move_Servo_Bidirect(8, 60, deploy_speed, 1);
+  move_Servo_Bidirect(10, 0, deploy_speed, 1);
+  move_Servo_Bidirect(9,  0, deploy_speed, 1);
+  move_Servo_Bidirect(11, -90, deploy_speed, 1);
+  move_Servo_Bidirect(10, 90,  deploy_speed, 1);
+  move_Servo_Bidirect(8,  118,  deploy_speed, 1);
+  move_Servo_Bidirect(9,  110,  deploy_speed, 1);
+  move_Servo_Bidirect(11,  -110,  deploy_speed, 1);
+}
 
+void roboDrive_ParkLeft_Arm_fromState4x(uint8_t parking_speed){
+                                                     // ---------- park Left-MechaArm (left) >> parked state (current draw ~ 0.6A)
+// ------------------------------------------------------- // Left-MechaArm op-codes // speed >> ((superfast) 1 - 255 (very slow))
+  move_Servo_Bidirect(10, 0, parking_speed, 1);
+  move_Servo_Bidirect(11, 0, parking_speed, 1);
+  move_Servo_Bidirect(8,  90, parking_speed, 1);
+  move_Servo_Bidirect(9, -20, parking_speed, 1);
+  move_Servo_Bidirect(11, 100,  parking_speed, 1);
+  move_Servo_Bidirect(10, 80,  parking_speed, 1);
+  // move_Servo_Bidirect(9,  110,  deploy_speed, 1);
+  // move_Servo_Bidirect(11,  -110,  deploy_speed, 1);
+}
+
+//----------------working here
 void roboDrive_DeployArmsState2(uint8_t deploy_speed){
                                                  // -deploy arms (state_2) (lef/right) >> state 2 (current draw ~ 0.50-0.65A)
 // --------------------------------------------- // right mecha arm op-codes,   // speed >> ((superfast) 1 - 255 (very slow))
@@ -2259,7 +2286,8 @@ void pcLinkSerial(void){                         // computer link!, function to 
                    printString("\r\nFront Light >> OFF\n");
                         break;
                 case 'Y' :
-                    roboDrive_Arm_Testing();
+                    //roboDrive_Arm_Testing();
+                    roboDrive_DeployLeft_Arm_State4x(40);
                         break;
                 case '#' :                     // apply only when both arms are streched, use this to recover from unknown states to parking
                     roboDrive_RecoverArms2Parking(servo_speed_mecha_arms);                     // speed >> ((superfast) 0 - 255 (very slow))
@@ -2356,7 +2384,8 @@ void pcLinkSerial(void){                         // computer link!, function to 
                     roboDrive_Crane_RightArm(35);                                              // speed >> ((superfast) 0 - 255 (very slow))
                        break;
                 case 'B' :
-                    vibration_Scanning();
+                    //vibration_Scanning();
+                    roboDrive_ParkLeft_Arm_fromState4x(45);
                         break;
                 case 'Z' :
                     temperatureScanner();

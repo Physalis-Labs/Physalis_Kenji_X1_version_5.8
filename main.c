@@ -103,12 +103,12 @@ extern uint8_t stepPhase;
 extern uint16_t stepCounter;
 
 int8_t  stepper_speed = 5;                         // holds step motor speed, possible to change on the fly via getnumber()
-uint8_t drive_speed = 40;                                                   //roboDrive() variables to pass value from UART
-uint8_t servo_speed_mecha_arms = 40;                    // holds mecha-arms servos speed, change on the fly via getnumber()
-uint8_t servo_speed_turning_mecha_arms = 40;           // holds mecha-arms turning(L/R) servo speed, change via getnumber()
-uint8_t servo_speed_towerdrive = 40;                 // holds tower servo vertical speed, change on the fly via getnumber()
-uint8_t servo_speed_grippers = 40;                   // both grippers speed (left/right), change on the fly via getnumber()
-uint8_t servo_speed_rotation_grippers = 40;           // both grippers rotation servo speed before updating via getnumber()
+uint8_t drive_speed = 30;                                                   //roboDrive() variables to pass value from UART
+uint8_t servo_speed_mecha_arms = 30;                    // holds mecha-arms servos speed, change on the fly via getnumber()
+uint8_t servo_speed_turning_mecha_arms = 30;           // holds mecha-arms turning(L/R) servo speed, change via getnumber()
+uint8_t servo_speed_towerdrive = 30;                 // holds tower servo vertical speed, change on the fly via getnumber()
+uint8_t servo_speed_grippers = 30;                   // both grippers speed (left/right), change on the fly via getnumber()
+uint8_t servo_speed_rotation_grippers = 30;           // both grippers rotation servo speed before updating via getnumber()
 
 volatile bool move_knob_R, move_knob_L;                            // variables tracking movement direction and speed right
 volatile bool move_dir_R, move_dir_L;                               // variables tracking movement direction and speed left
@@ -749,19 +749,39 @@ void roboDrive_DeployLeft_Arm_State4x(uint8_t deploy_speed){
   move_Servo_Bidirect(9,  110,  deploy_speed, 1);
   move_Servo_Bidirect(11,  -110,  deploy_speed, 1);
 }
-
+//--------------------------------------- WORKING HERE -----------------------------
+//--------------------------------------- WORKING HERE -----------------------------
+//--------------------------------------- WORKING HERE -----------------------------
+//--------------------------------------- WORKING HERE -----------------------------
 void roboDrive_ParkLeft_Arm_fromState4x(uint8_t parking_speed){
                                                      // ---------- park Left-MechaArm (left) >> parked state (current draw ~ 0.6A)
 // ------------------------------------------------------- // Left-MechaArm op-codes // speed >> ((superfast) 1 - 255 (very slow))
-  move_Servo_Bidirect(10, 0, parking_speed, 1);
-  move_Servo_Bidirect(11, 0, parking_speed, 1);
-  move_Servo_Bidirect(8,  90, parking_speed, 1);
-  move_Servo_Bidirect(9, -20, parking_speed, 1);
-  move_Servo_Bidirect(11, 100,  parking_speed, 1);
-  move_Servo_Bidirect(10, 80,  parking_speed, 1);
-  // move_Servo_Bidirect(9,  110,  deploy_speed, 1);
-  // move_Servo_Bidirect(11,  -110,  deploy_speed, 1);
+
+  move_Servo_Bidirect(13, -25, parking_speed, 1);
+  move_Servo_Bidirect(12, 0,   parking_speed, 1);
+  move_Servo_Bidirect(7,  0,   parking_speed, 1);
+  move_Servo_Bidirect(10, 0,   parking_speed, 1);
+  move_Servo_Bidirect(11, 0,   parking_speed, 1);
+  move_Servo_Bidirect(8,  90,  parking_speed, 1);
+  move_Servo_Bidirect(9, -20,  parking_speed, 1);
+  move_Servo_Bidirect(11, 90,  parking_speed, 1);
+  move_Servo_Bidirect(10, 70,  parking_speed, 1);
+  move_Servo_Bidirect(9, -57,  parking_speed, 1);
+  move_Servo_Bidirect(10, 45,  parking_speed, 1);
+  move_Servo_Bidirect(8,  110, parking_speed, 1);
+  move_Servo_Bidirect(11, 125, parking_speed, 1);
+  move_Servo_Bidirect(10, 54,  parking_speed, 1);
+
+  // move_Servo_Bidirect(7,   0,   parking_speed, 1);
+  // move_Servo_Bidirect(9, -70,   parking_speed, 1);
+  // move_Servo_Bidirect(11, 123,  parking_speed, 1);
+  // move_Servo_Bidirect(10,  53,  parking_speed, 1);
+  // move_Servo_Bidirect(8,  100,  parking_speed, 1);
 }
+//--------------------------------------- WORKING HERE -----------------------------
+//--------------------------------------- WORKING HERE -----------------------------
+//--------------------------------------- WORKING HERE -----------------------------
+//--------------------------------------- WORKING HERE -----------------------------
 
 //----------------working here
 void roboDrive_DeployArmsState2(uint8_t deploy_speed){

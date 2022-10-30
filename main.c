@@ -103,12 +103,12 @@ extern uint8_t stepPhase;
 extern uint16_t stepCounter;
 
 int8_t  stepper_speed = 5;                         // holds step motor speed, possible to change on the fly via getnumber()
-uint8_t drive_speed = 30;                                                   //roboDrive() variables to pass value from UART
-uint8_t servo_speed_mecha_arms = 30;                    // holds mecha-arms servos speed, change on the fly via getnumber()
-uint8_t servo_speed_turning_mecha_arms = 30;           // holds mecha-arms turning(L/R) servo speed, change via getnumber()
-uint8_t servo_speed_towerdrive = 30;                 // holds tower servo vertical speed, change on the fly via getnumber()
-uint8_t servo_speed_grippers = 30;                   // both grippers speed (left/right), change on the fly via getnumber()
-uint8_t servo_speed_rotation_grippers = 30;           // both grippers rotation servo speed before updating via getnumber()
+uint8_t drive_speed = 20;                                                   //roboDrive() variables to pass value from UART
+uint8_t servo_speed_mecha_arms = 20;                    // holds mecha-arms servos speed, change on the fly via getnumber()
+uint8_t servo_speed_turning_mecha_arms = 20;           // holds mecha-arms turning(L/R) servo speed, change via getnumber()
+uint8_t servo_speed_towerdrive = 20;                 // holds tower servo vertical speed, change on the fly via getnumber()
+uint8_t servo_speed_grippers = 20;                   // both grippers speed (left/right), change on the fly via getnumber()
+uint8_t servo_speed_rotation_grippers = 20;           // both grippers rotation servo speed before updating via getnumber()
 
 volatile bool move_knob_R, move_knob_L;                            // variables tracking movement direction and speed right
 volatile bool move_dir_R, move_dir_L;                               // variables tracking movement direction and speed left
@@ -117,8 +117,8 @@ volatile short hall_S2R_pulse;                                          // varia
 volatile short hall_S2L_pulse;                                           // variables for counting Hall sensor pulses /left
 
 volatile uint16_t year_ = 2022;                                                           // variable keeps track of years
-volatile uint8_t months_ = 10;                                                            // variable keeps track of months
-volatile uint8_t days_ = 27;                                                               // variable keeps track of days
+volatile uint8_t months_ = 11;                                                            // variable keeps track of months
+volatile uint8_t days_ = 5;                                                               // variable keeps track of days
 volatile uint8_t hours_ = 12;                                                             // variable keeps track of hours
 volatile uint8_t minutes_ = 30;                                                         // variable keeps track of minutes
 volatile uint8_t seconds_ = 25;                                                         // variable keeps track of seconds
@@ -597,7 +597,7 @@ void roboDrive_Arm_Testing(void){
 }
 
 // ----------------------------------- updated Mecha-Arms Control functions D.Z. --------------------------------------------//
-void roboDrive_RecoverArms2Parking(uint8_t recover_speed){
+void roboDrive_RecoverArmsForParking(uint8_t recover_speed){
                                        // apply only when both arms are streched, use to recover from unknown states to parking
 // ------------------------------------------------- // right mecha arm op-codes, // speed >> ((superfast) 1 - 255 (very slow))
   move_Servo_Bidirect(0,  0,  recover_speed, 1);
@@ -617,7 +617,7 @@ void roboDrive_RecoverArms2Parking(uint8_t recover_speed){
   move_Servo_Bidirect(13, -20,  recover_speed, 1);
 }
 
-void roboDrive_RecoverLeftArm2Parking(uint8_t recover_speed){
+void roboDrive_RecoverLeftArmForParking(uint8_t recover_speed){
                                               // apply only when arm is streched, use to recover from unknown states to parking
 // -------------------------------------------------- // Left mecha arm op-codes, // speed >> ((superfast) 1 - 255 (very slow))
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -631,7 +631,7 @@ void roboDrive_RecoverLeftArm2Parking(uint8_t recover_speed){
   move_Servo_Bidirect(13, -20,  recover_speed, 1);
 }
 
-void roboDrive_RecoverRightArm2Parking(uint8_t recover_speed){
+void roboDrive_RecoverRightArmForParking(uint8_t recover_speed){
                                               // apply only when arm is streched, use to recover from unknown states to parking
 // ------------------------------------------------- // right mecha arm op-codes, // speed >> ((superfast) 1 - 255 (very slow))
 // ------------------------------------------------------------------------------------------------------------------------- //
@@ -736,28 +736,24 @@ void roboDrive_DeployRight_Arm_State1(uint8_t deploy_speed){
   move_Servo_Bidirect(5,  0,   deploy_speed, 1);
   move_Servo_Bidirect(6, 30,   deploy_speed, 1);
 }
-//----------------working here
-void roboDrive_DeployLeft_Arm_State4x(uint8_t deploy_speed){
-                                                     // ---------- park Left-MechaArm (left) >> parked state (current draw ~ 0.6A)
-// ------------------------------------------------------- // Left-MechaArm op-codes // speed >> ((superfast) 1 - 255 (very slow))
-  move_Servo_Bidirect(8, 60, deploy_speed, 1);
-  move_Servo_Bidirect(10, 0, deploy_speed, 1);
-  move_Servo_Bidirect(9,  0, deploy_speed, 1);
-  move_Servo_Bidirect(11, -90, deploy_speed, 1);
-  move_Servo_Bidirect(10, 90,  deploy_speed, 1);
-  move_Servo_Bidirect(8,  118,  deploy_speed, 1);
-  move_Servo_Bidirect(9,  110,  deploy_speed, 1);
-  move_Servo_Bidirect(11,  -110,  deploy_speed, 1);
+//----------------working here>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+void roboDrive_DeployLeft_Arm_State4(uint8_t deploy_speed){
+                                           // ---------- Deploy Left-MechaArm (left) >> Deployed State-4 (current draw ~ 0.6A)
+// --------------------------------------------------- // Left-MechaArm op-codes // speed >> ((superfast) 1 - 255 (very slow))
+  move_Servo_Bidirect(8, 60,    deploy_speed, 1);
+  move_Servo_Bidirect(10, 0,    deploy_speed, 1);
+  move_Servo_Bidirect(9, 0,     deploy_speed, 1);
+  move_Servo_Bidirect(11, -90,  deploy_speed, 1);
+  move_Servo_Bidirect(10, 90,   deploy_speed, 1);
+  move_Servo_Bidirect(8, 118,   deploy_speed, 1);
+  move_Servo_Bidirect(9, 110,   deploy_speed, 1);
+  move_Servo_Bidirect(11, -110, deploy_speed, 1);
 }
-//--------------------------------------- WORKING HERE -----------------------------
-//--------------------------------------- WORKING HERE -----------------------------
-//--------------------------------------- WORKING HERE -----------------------------
-//--------------------------------------- WORKING HERE -----------------------------
-void roboDrive_ParkLeft_Arm_fromState4x(uint8_t parking_speed){
-                                                     // ---------- park Left-MechaArm (left) >> parked state (current draw ~ 0.6A)
-// ------------------------------------------------------- // Left-MechaArm op-codes // speed >> ((superfast) 1 - 255 (very slow))
 
-  move_Servo_Bidirect(13, -25, parking_speed, 1);
+void roboDrive_ParkLeft_Arm_fromState4(uint8_t parking_speed){
+                                                // ---------- Park Left-MechaArm (left) >> Parked-State 4 (current draw ~ 0.6A)
+// ---------------------------------------------------- // Left-MechaArm op-codes // speed >> ((superfast) 1 - 255 (very slow))
+  move_Servo_Bidirect(13, 10,  parking_speed, 1);
   move_Servo_Bidirect(12, 0,   parking_speed, 1);
   move_Servo_Bidirect(7,  0,   parking_speed, 1);
   move_Servo_Bidirect(10, 0,   parking_speed, 1);
@@ -771,19 +767,8 @@ void roboDrive_ParkLeft_Arm_fromState4x(uint8_t parking_speed){
   move_Servo_Bidirect(8,  110, parking_speed, 1);
   move_Servo_Bidirect(11, 125, parking_speed, 1);
   move_Servo_Bidirect(10, 54,  parking_speed, 1);
-
-  // move_Servo_Bidirect(7,   0,   parking_speed, 1);
-  // move_Servo_Bidirect(9, -70,   parking_speed, 1);
-  // move_Servo_Bidirect(11, 123,  parking_speed, 1);
-  // move_Servo_Bidirect(10,  53,  parking_speed, 1);
-  // move_Servo_Bidirect(8,  100,  parking_speed, 1);
 }
-//--------------------------------------- WORKING HERE -----------------------------
-//--------------------------------------- WORKING HERE -----------------------------
-//--------------------------------------- WORKING HERE -----------------------------
-//--------------------------------------- WORKING HERE -----------------------------
 
-//----------------working here
 void roboDrive_DeployArmsState2(uint8_t deploy_speed){
                                                  // -deploy arms (state_2) (lef/right) >> state 2 (current draw ~ 0.50-0.65A)
 // --------------------------------------------- // right mecha arm op-codes,   // speed >> ((superfast) 1 - 255 (very slow))
@@ -2307,16 +2292,16 @@ void pcLinkSerial(void){                         // computer link!, function to 
                         break;
                 case 'Y' :
                     //roboDrive_Arm_Testing();
-                    roboDrive_DeployLeft_Arm_State4x(40);
+                    roboDrive_DeployLeft_Arm_State4(servo_speed_mecha_arms);
                         break;
                 case '#' :                     // apply only when both arms are streched, use this to recover from unknown states to parking
-                    roboDrive_RecoverArms2Parking(servo_speed_mecha_arms);                     // speed >> ((superfast) 0 - 255 (very slow))
+                    roboDrive_RecoverArmsForParking(servo_speed_mecha_arms);                     // speed >> ((superfast) 0 - 255 (very slow))
                         break;
                 case '7' :                       // apply only when left arm is streched, use this to recover from unknown states to parking
-                    roboDrive_RecoverLeftArm2Parking(servo_speed_mecha_arms);                  // speed >> ((superfast) 0 - 255 (very slow))
+                    roboDrive_RecoverLeftArmForParking(servo_speed_mecha_arms);                  // speed >> ((superfast) 0 - 255 (very slow))
                         break;
                 case '9' :                      // apply only when right arm is streched, use this to recover from unknown states to parking
-                    roboDrive_RecoverRightArm2Parking(servo_speed_mecha_arms);                 // speed >> ((superfast) 0 - 255 (very slow))
+                    roboDrive_RecoverRightArmForParking(servo_speed_mecha_arms);                 // speed >> ((superfast) 0 - 255 (very slow))
                         break;
                 case 'L' :                                      // ------------------- park arm (left) >> parked state (current draw ~ 0.6A)
                     roboDrive_ParkLeftArm(servo_speed_mecha_arms);                             // speed >> ((superfast) 0 - 255 (very slow))
@@ -2405,7 +2390,7 @@ void pcLinkSerial(void){                         // computer link!, function to 
                        break;
                 case 'B' :
                     //vibration_Scanning();
-                    roboDrive_ParkLeft_Arm_fromState4x(45);
+                    roboDrive_ParkLeft_Arm_fromState4(servo_speed_mecha_arms);
                         break;
                 case 'Z' :
                     temperatureScanner();
